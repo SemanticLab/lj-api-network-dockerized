@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Linked Jazz Api</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 20px;
+        padding-bottom: 40px;
+      }
+
+      /* Custom container */
+      .container-narrow {
+        margin: 0 auto;
+        max-width: 700px;
+      }
+      .container-narrow > hr {
+        margin: 30px 0;
+      }
+
+      /* Main marketing message and sign up button */
+      .jumbotron {
+        margin: 60px 0;
+        text-align: center;
+      }
+      .jumbotron h1 {
+        font-size: 72px;
+        line-height: 1;
+      }
+      .jumbotron .btn {
+        font-size: 21px;
+        padding: 14px 24px;
+      }
+
+      /* Supporting marketing content */
+      .marketing {
+        margin: 60px 0;
+      }
+      .marketing p + h4 {
+        margin-top: 28px;
+      }
+    </style>
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <div class="container-narrow">
+
+<h1 id="linkedjazz">Linked Jazz</h1>
+
+<p><img src="http://linkedjazz.org/image/jl_logo_small.png" alt="Linked Jazz" title="" /></p>
+
+<h2 id="apidocumentation">API Documentation</h2>
+
+<p>This document explains the Linked Jazz API which returns data from the project's transcript analysis and crowdsourcing programs. For the Jazz Name Directory, please visit <a href="http://linkedjazz.org/content/linked-jazz-name-directory/">this page</a>.</p>
+
+<p>The Base URL is:</p>
+
+<pre><code>http://linkedjazz.org/api/
+</code></pre>
+
+<p>This api has three end points that accept GET requests:</p>
+
+<ul>
+<li>http://linkedjazz.org/api/people/</li>
+<li>http://linkedjazz.org/api/relationships/</li>
+<li>http://linkedjazz.org/api/text/</li>
+</ul>
+
+<p>Data is returned by default in JSON format, some requests allow the return of the data in RDF Triple format if a "/nt" is append to the request url. Likewise, the relationship endpoint will return a GEXF network file for use in Gephi network analysis program if "/gexf" is append to the request (<a href="#examples">examples provided below</a>).</p>
+
+
+<div class="alert alert-info">
+  <h4>Quick Start Examples:</h4>
+    <hr>
+  Get all people in json and RDF Triple:<br>
+  <a href="http://linkedjazz.org/api/people/all" target="_blank">http://linkedjazz.org/api/people/all</a><br>
+  <a href="http://linkedjazz.org/api/people/all/nt" target="_blank">http://linkedjazz.org/api/people/all/nt</a><br><br>
+  Get relationships for Mary Lou Williams in json and triple:<br>
+    <a href="http://linkedjazz.org/api/relationships/%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FMary_Lou_Williams%3E" target="_blank">http://linkedjazz.org/api/relationships/%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FMary_Lo...</a><br>
+<a href="http://linkedjazz.org/api/relationships/%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FMary_Lou_Williams%3E/nt" target="_blank">http://linkedjazz.org/api/relationships/%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FMary_Lo.../nt</a><br><br>
+Get Mary Lou Williams's Ego network in Gephi's GEXF format:<br>
+<a href="http://linkedjazz.org/api/relationships/ego/%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FMary_Lou_Williams%3E/gexf" target="_blank">http://linkedjazz.org/api/relationships/ego/%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FMar.../gexf</a><br><br>
+
+
+Get all relationships in Triple format which includes crowdsourcing data:<br>
+<a href="http://linkedjazz.org/api/relationships/all/nt" target="_blank">http://linkedjazz.org/api/relationships/all/nt</a><br><br>
+
+
+</div>
+
+
+<h3 id="people">People</h3>
+
+<p>The people endpoint has a search request and a dump endpoint. Entities that are returned appear in the transcripts analyzed and have relationships associated with them. To search add "search/XYZ" to the url. For example to search for people with the word "Fats" in their name use:</p>
+
+<pre><code>http://linkedjazz.org/api/people/search/Fats
+</code></pre>
+
+<p>Will return a array of objects with names matching the search request. </p>
+
+<pre><code>[
+    {
+        "name": "Fats Navarro",
+        "uri": "&lt;http://dbpedia.org/resource/Fats_Navarro&gt;",
+        "uriEncoded": "%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FFats_Navarro%3E",
+        "image": "http://linkedjazz.org/image/square/Fats_Navarro.png"
+    },
+        {
+        "name": "Fats Waller",
+        "uri": "&lt;http://dbpedia.org/resource/Fats_Waller&gt;",
+        "uriEncoded": "%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FFats_Waller%3E",
+        "image": "http://linkedjazz.org/image/square/Fats_Waller.png"
+    }
+]
+</code></pre>
+
+<ul>
+<li>name - The individual's name.</li>
+<li>uri - The authoritative URI used for this individual.</li>
+<li>uriEncoded - The URI encoded for use with this API</li>
+<li>image - Optional, the image we use for this individual.</li>
+<li>comment - Optional, any extra information added for this person by the LJ project.</li>
+</ul>
+
+<p>This API uses the full URI for requests, the URI must be encoded, forward slashes must be represented by <code>%2F</code></p>
+
+<pre><code>http://linkedjazz.org/api/people/search/Fats/nt
+</code></pre>
+
+<p>Will return the same information in RDF Triple format.</p>
+
+<p>To download all idividuals at once (data dump) use:</p>
+
+<pre><code>http://linkedjazz.org/api/people/all
+</code></pre>
+
+<p>Data dumps are updated hourly.</p>
+
+<h3 id="relationships">Relationships</h3>
+
+<p>Relationship information has two facets:</p>
+
+<ol>
+<li>That a basic rel:knowsOf relationship exists and its direction.</li>
+<li>Annotations from the crowdsourcing tool as to the more specific nature of the relationship.</li>
+</ol>
+
+<p>All annotations are returned for a specific relationship, these annotations are added to the system by visitors to the 52nd St. crowdsourcing tool. Currently the API does not aggregate the varying opinions of a specific relationship into a quantified value, it just returns all opinions (even duplicate). This endpoint has the ability to return Gephi compatible GEXF files by appending "/gexf" to the url. Annotated relationships are not returned in the Gephi network, only a single basic rel:knowsOf. This endpoint can also return triples with the "/nt" argument.</p>
+
+<p>You can request:</p>
+
+<ul>
+<li>Relationships of an individual</li>
+<li>Request their <a href="http://en.wikipedia.org/wiki/Social_network#Micro_level">Ego network</a></li>
+<li>Data dump of all relationships (updated hourly)</li>
+</ul>
+
+<p>To return all relationships an idividual has pass their encoded URI as the seconf argument: </p>
+
+<pre><code> http://linkedjazz.org/api/relationships/%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FFats_Navarro%3E 
+</code></pre>
+
+<p>To return their ego network add /ego/: </p>
+
+<pre><code> http://linkedjazz.org/api/relationships/ego/%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2FFats_Navarro%3E 
+</code></pre>
+
+<p>To return all relationships: </p>
+
+<pre><code> http://linkedjazz.org/api/relationships/all
+</code></pre>
+
+<p>Again, adding "/nt" or "/gexf" will return the request in that format.</p>
+
+<p>JSON Response:</p>
+
+<ul>
+<li>transcript - the hash id of the transcript this relationship occured in.</li>
+<li>uri - the uri of the other person invovled in this relationship</li>
+<li>uriEncoded - the encoded uri of the other person invovled in this relationship</li>
+<li>count - the number of times this relationship happend in this transcript</li>
+<li>occurances - and array of objects:
+<ul><li>id - the id of the text fragment</li>
+<li>type - A or Q, answer or question type of the fragment</li></ul></li>
+<li>isTalkingAbout - true or false, if true the person owning this response (the uri used in the request) is talking about this person. Otherwise This person is talking about the person used in the request.</li>
+<li>userTalkingAbout/userBeingTalkedAbout - an array of data from the crowdsourcing, each object contains:
+<ul><li>id - internal id</li>
+<li>source - who is talking</li>
+<li>target - about whom</li>
+<li>transcript - the id of the transcript it occured in</li>
+<li>value - The RDF statement of the opinion the user had of this realtionship:
+<ul><li><a href="http://purl.org/vocab/relationship/knowsOf">http://purl.org/vocab/relationship/knowsOf</a></li>
+<li><a href="http://purl.org/vocab/relationship/hasMet">http://purl.org/vocab/relationship/hasMet</a></li>
+<li><a href="http://purl.org/vocab/relationship/acquaintanceOf">http://purl.org/vocab/relationship/acquaintanceOf</a></li>
+<li><a href="http://purl.org/vocab/relationship/friendOf">http://purl.org/vocab/relationship/friendOf</a></li>
+<li><a href="http://purl.org/vocab/relationship/closeFriendOf">http://purl.org/vocab/relationship/closeFriendOf</a></li>
+<li><a href="http://purl.org/vocab/relationship/influencedBy">http://purl.org/vocab/relationship/influencedBy</a></li>
+<li><a href="http://purl.org/vocab/relationship/mentorOf">http://purl.org/vocab/relationship/mentorOf</a></li>
+<li><a href="http://purl.org/ontology/mo/collaborated_with">http://purl.org/ontology/mo/collaborated_with</a></li>
+<li><a href="http://linkedjazz.org/ontology/inBandTogether">http://linkedjazz.org/ontology/inBandTogether</a></li>
+<li><a href="http://linkedjazz.org/ontology/playedTogether">http://linkedjazz.org/ontology/playedTogether</a></li>
+<li><a href="http://linkedjazz.org/ontology/bandmember">http://linkedjazz.org/ontology/bandmember</a></li>
+<li><a href="http://linkedjazz.org/ontology/touredWith">http://linkedjazz.org/ontology/touredWith</a></li>
+<li><a href="http://linkedjazz.org/ontology/bandLeaderOf">http://linkedjazz.org/ontology/bandLeaderOf</a></li></ul></li>
+<li>idLocals - the pair of text fragment ids for this judgement.</li>
+<li>sourceEncoded/targetEncoded - the uris encoded</li></ul></li>
+</ul>
+
+<h3 id="text">Text</h3>
+
+<p>The text endpoint simply returns text from the transcript, pass it the transcript hash ID along with the localId numbers you want seperated by commas. This informaton is returned in the realtionship calls. For example:</p>
+
+<pre><code> http://linkedjazz.org/api/text/f3f0c653ce34f6ff5b6c11734cbe154a/1,5,6,7,4,3
+</code></pre>
+
+<p>Only JSON response for the text endpoint are available.</p>
+
+
+    <hr>
+    <a id="examples"></a>    <h2>100 Examples</h2>
+
+    <div></div>
+            <table class="table table-condensed">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Links</th>
+                </tr>
+              </thead>
+              <tbody id="exampleTable">
+
+              </tbody>
+            </table>
+    </div>
+
+    <script>
+      $(document).ready(function() {
+       
+
+
+        $.get("people/all", function(data){
+
+            
+
+            for (var i=0; i<100; i++) {
+            
+                
+                var d = data[Math.floor(Math.random()*1400)];
+
+                var tr = $('<tr>');
+
+                tr.append(
+                    $("<td>")
+                        .text(d.name)
+                    );
+
+
+                tr.append(
+                    $("<td>")
+                        .append(
+                            $("<a>")
+                                .text("Relationships: json")
+                                .attr('href', "http://linkedjazz.org/api/relationships/" + d.uriEncoded)
+                                .attr('target', "_blank")
+                        )
+                        .append($("<span>").html('&nbsp;'))
+                        .append(
+                            $("<a>")
+                                .text("NT")
+                                .attr('href', "http://linkedjazz.org/api/relationships/" + d.uriEncoded + '/nt')
+                                .attr('target', "_blank")
+                        )
+                        .append($("<span>").html('&nbsp;'))
+                        .append(
+                            $("<a>")
+                                .text("ego gephi")
+                                .attr('href', "http://linkedjazz.org/api/relationships/ego/" + d.uriEncoded + '/gexf')
+                                .attr('target', "_blank")
+                        )                       
+                    );
+
+
+                $("#exampleTable").append(tr);
+
+
+            }
+
+
+        });
+
+
+      });
+
+    </script>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-34282776-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+  </body>
+</html>
